@@ -28,3 +28,7 @@ dnf5 install -y wireshark
 mkdir -p /nix
 dnf5 install -y nix nix-daemon
 systemctl enable nix-daemon
+
+# install additional dev tools
+dnf install -y @development-tools
+dnf5 install -y python3-wheel python3-devel python3-netifaces
