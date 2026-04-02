@@ -26,5 +26,6 @@ dnf5 install -y wireshark
 # install nix
 # from https://fedoraproject.org/wiki/Changes/Nix_package_tool#How_To_Test
 mkdir -p /nix
-dnf5 install -y nix nix-daemon
+dnf5 install -y nix nix-daemon 
+dnf install @development-tools
 systemctl enable nix-daemon
