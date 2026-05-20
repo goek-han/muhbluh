@@ -24,10 +24,36 @@ dnf5 install -y wireshark
 # systemctl enable podman.socket
 
 # install nix
-# from https://fedoraproject.org/wiki/Changes/Nix_package_tool#How_To_Test
-mkdir -p /nix
-dnf5 install -y nix nix-daemon
-systemctl enable nix-daemon
+# # from https://fedoraproject.org/wiki/Changes/Nix_package_tool#How_To_Test
+# mkdir -p /nix
+# dnf5 install -y nix nix-daemon
+# systemctl enable nix-daemon
+
+# determinate installer
+
+rm -rf /nix /var/lib/nix 2>/dev/null || true
+
+mkdir -p /etc/ostree
+cat >/etc/ostree/prepare-root.conf <<'EOF'
+[composefs]
+enabled = yes
+[root]
+transient = true
+EOF
+rpm-ostree initramfs-etc --track=/etc/ostree/prepare-root.conf
+
+curl -fsSL https://install.determinate.systems/nix | sh -s -- install ostree \
+  --no-confirm \
+  --explain \
+  --persistence=/var/lib/nix \
+  --extra-conf "experimental-features = nix-command flakes"
+
+cat >/etc/profile.d/nix.sh <<'EOF'
+if [ -e /var/lib/nix/profiles/default/etc/profile.d/nix.sh ]; then
+  . /var/lib/nix/profiles/default/etc/profile.d/nix.sh
+fi
+EOF
+chmod +x /etc/profile.d/nix.sh
 
 # install additional dev tools
 dnf install -y @development-tools
